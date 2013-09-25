@@ -7,22 +7,20 @@ var countdown = function (date,format) {
     }
     var _countdown = {};
     var defaultConfig = {
-        pad : true,
-        daysDisplay = "cd-days",
-        hoursDisplay = "cd-hours",
-        minutesDisplay = "cd-minutes",
-        secondsDisplay = "cd-seconds"
+        pad : false,
+        daysDisplay : "cd-days",
+        hoursDisplay : "cd-hours",
+        minutesDisplay : "cd-minutes",
+        secondsDisplay : "cd-seconds"
     }
     _countdown.config = defaultConfig;
     _countdown.now = moment();
     _countdown.targetDate = moment(date,format);
 
-    (function(){
-        _countdown.daysDisplay = document.getElementById(_countdown.config.daysDisplay);
-        _countdown.hoursDisplay = document.getElementById(_countdown.config.hoursDisplay);
-        _countdown.minutesDisplay = document.getElementById(_countdown.config.minutesDisplay);
-        _countdown.secondsDisplay = document.getElementById(_countdown.config.secondsDisplay);
-    }())
+    _countdown.daysDisplay = document.getElementById(_countdown.config.daysDisplay);
+    _countdown.hoursDisplay = document.getElementById(_countdown.config.hoursDisplay);
+    _countdown.minutesDisplay = document.getElementById(_countdown.config.minutesDisplay);
+    _countdown.secondsDisplay = document.getElementById(_countdown.config.secondsDisplay);
 
     function hoursToMidnight(){
         var midnight = new Date();
@@ -36,27 +34,37 @@ var countdown = function (date,format) {
     
     _countdown.calculate = function(unit){
         if(unit == _undefined) throw new Error("No unit specified");
-        var diff = targetDate.diff(_countdown.now,unit);
+        var diff = _countdown.targetDate.diff(_countdown.now,unit);
         return diff;
     }
 
-    _countdown.seconds = function(){ return 60 - _countdown.now.seconds()};
-    _countdown.minutes = function(){ return 60 - _countdown.now.minutes()};
+    _countdown.seconds = function(){ return 59 - _countdown.now.seconds()};
+    _countdown.minutes = function(){ return 59 - _countdown.now.minutes()};
     _countdown.hours = function(){
         if(_countdown.isToday()){
             return _countdown.hoursUntil();
         }else{
-            return 60 - hoursToMidnight();
+            return hoursToMidnight();
         }
     };
     _countdown.days = function(){return _countdown.calculate('days')};
     _countdown.milliseconds = function(){return _countdown.calculate('milliseconds')};
     _countdown.isToday = function(){return _countdown.days() == 0};
-    _countdown.hasPast = function(){return _countdown.days() < 0;}
+    _countdown.hasPast = function(){return _countdown.days() <= 0 && _countdown.hours() <= 0 && _countdown.minutes() <= 0 && _countdown.seconds() <= 0;}
     
 
     _countdown.updateDisplay = function(){
-        
+        var data = _countdown.seconds();
+        _countdown.secondsDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
+
+        data = _countdown.minutes();
+        _countdown.minutesDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
+
+        data = _countdown.hours();
+        _countdown.hoursDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
+
+        data = _countdown.days();
+        _countdown.daysDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
     };
 
     _countdown.daysUntil = function(){return _countdown.calculate('days')}
@@ -68,3 +76,4 @@ var countdown = function (date,format) {
 }
 d = countdown("10-2-2013","MM-DD-YYYY");
 //d.calculate('milliseconds');
+d.updateDisplay()
