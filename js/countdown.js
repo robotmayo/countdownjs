@@ -12,21 +12,16 @@ var countdown = function (date,format) {
         hoursDisplay : "cd-hours",
         minutesDisplay : "cd-minutes",
         secondsDisplay : "cd-seconds",
-        millisecondsDisplay : "cd-milliseconds"
-        exclude : "s:m"
+        millisecondsDisplay : "cd-milliseconds",
+        exclude : "mm:d"
     }
     _countdown.config = defaultConfig;
     _countdown.now = moment();
     _countdown.targetDate = moment(date,format);
 
     function setUpConfig(){
-        _countdown.daysDisplay = document.getElementById(_countdown.config.daysDisplay);
-        _countdown.hoursDisplay = document.getElementById(_countdown.config.hoursDisplay);
-        _countdown.minutesDisplay = document.getElementById(_countdown.config.minutesDisplay);
-        _countdown.secondsDisplay = document.getElementById(_countdown.config.secondsDisplay);
-        _countdown.millisecondsDisplay = document.getElementById(_countdown.config.millisecondsDisplay);
-        var e = exclude.split(":");
-        _coundown.exclude = {hours: false,minutes:false,seconds:false,days:false,milliseconds:true}
+        var e = _countdown.config.exclude.split(":");
+        _countdown.exclude = {hours: false,minutes:false,seconds:false,days:false,milliseconds:true}
         for(var i = 0; i < e.length; i++){
             e[i].toLowerCase();
             switch(e[i]){
@@ -47,7 +42,14 @@ var countdown = function (date,format) {
                     break;
             }
         }
+        if(!_countdown.exclude.days) _countdown.daysDisplay = document.getElementById(_countdown.config.daysDisplay);
+        if(!_countdown.exclude.hours) _countdown.hoursDisplay = document.getElementById(_countdown.config.hoursDisplay);
+        if(!_countdown.exclude.minutes) _countdown.minutesDisplay = document.getElementById(_countdown.config.minutesDisplay);
+        if(!_countdown.exclude.seconds) _countdown.secondsDisplay = document.getElementById(_countdown.config.secondsDisplay);
+        if(!_countdown.exclude.milliseconds) _countdown.millisecondsDisplay = document.getElementById(_countdown.config.millisecondsDisplay);
+        
     }
+    setUpConfig();
 
     function hoursToMidnight(){
         var midnight = new Date();
@@ -81,18 +83,30 @@ var countdown = function (date,format) {
     
 
     _countdown.updateDisplay = function(){
-        var data = _countdown.seconds();
-        if(!_countdown.config.exlude.minutes)
-        _countdown.secondsDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
+        var data = 0;
+        if(!_countdown.exclude.seconds){
+            data = _countdown.seconds();
+            _countdown.secondsDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
+            if(_countdown.onDisplayUpdate) _countdown.onDisplayUpdate();
+        }
 
-        data = _countdown.minutes();
-        _countdown.minutesDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
+        if(!_countdown.exclude.minutes){
+            data = _countdown.minutes();
+            _countdown.minutesDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
+            if(_countdown.onDisplayUpdate) _countdown.onDisplayUpdate();
+        }
 
-        data = _countdown.hours();
-        _countdown.hoursDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
+        if(!_countdown.exclude.hours){
+            _countdown.hoursDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
+            if(_countdown.onDisplayUpdate) _countdown.onDisplayUpdate();
+        }
 
-        data = _countdown.days();
-        _countdown.daysDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
+        if(!_countdown.exclude.days){
+            data = _countdown.days();
+            _countdown.daysDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
+            if(_countdown.onDisplayUpdate) _countdown.onDisplayUpdate();
+        }
+        if(_countdown.onDisplayUpdate) _countdown.onDisplayUpdate();
     };
 
     _countdown.daysUntil = function(){return _countdown.calculate('days')}
