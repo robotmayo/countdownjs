@@ -11,16 +11,41 @@ var countdown = function (date,format) {
         daysDisplay : "cd-days",
         hoursDisplay : "cd-hours",
         minutesDisplay : "cd-minutes",
-        secondsDisplay : "cd-seconds"
+        secondsDisplay : "cd-seconds",
+        exclude : "s:m"
     }
     _countdown.config = defaultConfig;
     _countdown.now = moment();
     _countdown.targetDate = moment(date,format);
 
-    _countdown.daysDisplay = document.getElementById(_countdown.config.daysDisplay);
-    _countdown.hoursDisplay = document.getElementById(_countdown.config.hoursDisplay);
-    _countdown.minutesDisplay = document.getElementById(_countdown.config.minutesDisplay);
-    _countdown.secondsDisplay = document.getElementById(_countdown.config.secondsDisplay);
+    function setUpConfig(){
+        _countdown.daysDisplay = document.getElementById(_countdown.config.daysDisplay);
+        _countdown.hoursDisplay = document.getElementById(_countdown.config.hoursDisplay);
+        _countdown.minutesDisplay = document.getElementById(_countdown.config.minutesDisplay);
+        _countdown.secondsDisplay = document.getElementById(_countdown.config.secondsDisplay);
+        var e = exclude.split(":");
+        _coundown.exclude = {hours: false,minutes:false,seconds:false,days:false,milliseconds:true}
+        for(var i = 0; i < e.length; i++){
+            e[i].toLowerCase();
+            switch(e[i]){
+                case "m":
+                    _countdown.exclude.minutes = true;
+                    break;
+                case "s":
+                    _countdown.exclude.seconds = true;
+                    break;
+                case "ml":
+                    _countdown.exclude.milliseconds = true;
+                    break;
+                case "h":
+                    _countdown.exclude.hours = true;
+                    break;
+                case "d":
+                    _countdown.exclude.days = true;
+                    break;
+            }
+        }
+    }
 
     function hoursToMidnight(){
         var midnight = new Date();
@@ -55,6 +80,7 @@ var countdown = function (date,format) {
 
     _countdown.updateDisplay = function(){
         var data = _countdown.seconds();
+        if(!_countdown.config.exlude.minutes)
         _countdown.secondsDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
 
         data = _countdown.minutes();
