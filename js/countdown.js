@@ -1,4 +1,4 @@
-var countdown = function (date,format) {
+var countdown = function (date,format,config) {
     // First things first, check for momentjs
     var _undefined;
     if(window.moment == _undefined){
@@ -13,11 +13,26 @@ var countdown = function (date,format) {
         minutesDisplay : "cd-minutes",
         secondsDisplay : "cd-seconds",
         millisecondsDisplay : "cd-milliseconds",
-        exclude : "mm"
+        exclude : "mm",
+        onFinish : _undefined,
+        onDisplayUpdate : _undefined,
+        onMillisecondsDisplayUpdate : _undefined,
+        onSecondsDisplayUpdate : _undefined,
+        onHoursDisplayUpdate : _undefined,
+        onDaysDisplayUpdate : _undefined,
     }
-    _countdown.config = defaultConfig;
+    
     _countdown.now = moment();
     _countdown.targetDate = moment(date,format);
+
+    if(config){
+        var holderObj = {};
+        for(var name in defaultConfig) {holderObj[name] = defaultConfig[name];}
+        for(var name in _countdown.config){holderObj[name] = _countdown.config[name];}
+        return holderObj;
+    }else{
+        _countdown.config = defaultConfig;
+    }
 
     function setUpConfig(){
         var e = _countdown.config.exclude.split(":");
@@ -122,6 +137,10 @@ var countdown = function (date,format) {
         _countdown.intervalID = setInterval(_countdown.update,1000);
     }
     _countdown.update = function(){
+        if(_countdown.hasPast()){
+            if(_countdown.onFinish) _countdown.onFinish();
+            clearInterval(_countdown.intervalID);
+        }
         _countdown.now = moment();
         _countdown.updateDisplay();
     }
