@@ -13,7 +13,7 @@ var countdown = function (date,format) {
         minutesDisplay : "cd-minutes",
         secondsDisplay : "cd-seconds",
         millisecondsDisplay : "cd-milliseconds",
-        exclude : "mm:d"
+        exclude : "mm"
     }
     _countdown.config = defaultConfig;
     _countdown.now = moment();
@@ -84,38 +84,56 @@ var countdown = function (date,format) {
 
     _countdown.updateDisplay = function(){
         var data = 0;
+
+        if(!_countdown.exclude.milliseconds){
+            data = _countdown.milliseconds();
+            _countdown.millisecondsDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
+            if(_countdown.onMillisecondsDisplayUpdate) _countdown.onMillisecondsDisplayUpdate();
+        }
+
         if(!_countdown.exclude.seconds){
             data = _countdown.seconds();
             _countdown.secondsDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
-            if(_countdown.onDisplayUpdate) _countdown.onDisplayUpdate();
+            if(_countdown.onSecondsDisplayUpdate) _countdown.onSecondsDisplayUpdate();
         }
 
         if(!_countdown.exclude.minutes){
             data = _countdown.minutes();
             _countdown.minutesDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
-            if(_countdown.onDisplayUpdate) _countdown.onDisplayUpdate();
+            if(_countdown.onMinutesDisplayUpdate) _countdown.onMinutesDisplayUpdate();
         }
 
         if(!_countdown.exclude.hours){
+            data = _countdown.hours();
             _countdown.hoursDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
-            if(_countdown.onDisplayUpdate) _countdown.onDisplayUpdate();
+            if(_countdown.onHoursDisplayUpdate) _countdown.onHoursDisplayUpdate();
         }
 
         if(!_countdown.exclude.days){
             data = _countdown.days();
             _countdown.daysDisplay.innerHTML = data < 10 && _countdown.config.pad ? "0"+data : data;
-            if(_countdown.onDisplayUpdate) _countdown.onDisplayUpdate();
+            if(_countdown.onDaysDisplayUpdate) _countdown.onDaysDisplayUpdate();
         }
         if(_countdown.onDisplayUpdate) _countdown.onDisplayUpdate();
     };
+
+    _countdown.begin = function(){
+        _countdown.update();
+        _countdown.intervalID = setInterval(_countdown.update,1000);
+    }
+    _countdown.update = function(){
+        _countdown.now = moment();
+        _countdown.updateDisplay();
+    }
 
     _countdown.daysUntil = function(){return _countdown.calculate('days')}
     _countdown.hoursUntil = function(){return _countdown.calculate('hours')}
     _countdown.secondsUntil = function(){return _countdown.calculate('seconds')}
     _countdown.minutesUntil = function(){return _countdown.calculate('minutes')}
 
+
     return _countdown;
 }
 d = countdown("10-2-2013","MM-DD-YYYY");
 //d.calculate('milliseconds');
-d.updateDisplay()
+d.begin();
