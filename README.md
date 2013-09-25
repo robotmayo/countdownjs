@@ -1,4 +1,4 @@
 countdownjs
 ===========
 
-A simple javascript countdown timer
+A simple javascript countdown timer built with momentJS
